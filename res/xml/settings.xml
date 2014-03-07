@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    <EditTextPreference android:key="auth_id" android:dialogTitle="@string/auth_id" android:hint="@string/auth_id_hint" android:title="@string/auth_id"/>
+    <EditTextPreference android:dialogTitle="@string/auth_pw" android:key="auth_pw" android:password="true" android:hint="@string/auth_pw_hint" android:title="@string/auth_pw"/>
+    
+
+</PreferenceScreen>

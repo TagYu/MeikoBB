@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">NitechBB</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+    
+    <string name="auth_id">基盤ID</string>
+    <string name="auth_id_hint">基盤ID</string>
+    <string name="auth_pw">基盤パスワード</string>
+    <string name="auth_pw_hint">基盤パスワード</string>
+
+</resources>
