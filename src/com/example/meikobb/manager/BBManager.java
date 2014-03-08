@@ -10,12 +10,15 @@ import android.database.Cursor;
 import android.preference.PreferenceManager;
 
 import com.example.meikobb.activity.SettingsActivity;
-import com.example.meikobb.model.BBItemHeader;
-import com.example.meikobb.sqlite.DBBBItemHeader;
+import com.example.meikobb.model.BBItemBody;
+import com.example.meikobb.model.BBItemHead;
+import com.example.meikobb.sqlite.DBBBItemBody;
+import com.example.meikobb.sqlite.DBBBItemHead;
 
 public class BBManager {
 	static BBHandler mBBHandler;
-	static DBBBItemHeader mDBBBItemHeader;
+	static DBBBItemHead mDBBBItemHead;
+	static DBBBItemBody mDBBBItemBody;
 	
 	/* コンストラクタ */
 	public BBManager(Context context) {
@@ -33,8 +36,9 @@ public class BBManager {
 		String authID = prefs.getString(SettingsActivity.PREF_KEY_AUTH_ID, "");
 		String authPW = prefs.getString(SettingsActivity.PREF_KEY_AUTH_PW, "");
 		mBBHandler.initialize(authID, authPW);
-		
-		mDBBBItemHeader = new DBBBItemHeader(context);
+
+		mDBBBItemHead = new DBBBItemHead(context);
+		mDBBBItemBody = new DBBBItemBody(context);
 	}
 	
 	
@@ -42,31 +46,27 @@ public class BBManager {
 	/**
 	 * DB 内の記事一覧を取得
 	 */
-	public List<BBItemHeader> getBBItems(String filter, String orderBy, String limit) {
-		List<BBItemHeader> list = new ArrayList<BBItemHeader>();
+	public List<BBItemHead> getHeads(String filter, String orderBy, String limit) {
+		List<BBItemHead> list = new ArrayList<BBItemHead>();
 		
-		Cursor cursor = mDBBBItemHeader.getReadableDatabase().query(
-				DBBBItemHeader.TABLE_NAME,
+		Cursor cursor = mDBBBItemHead.getReadableDatabase().query(
+				DBBBItemHead.TABLE_NAME,
 				null,
-				DBBBItemHeader.COL_TITLE + "||" + DBBBItemHeader.COL_AUTHOR
+				DBBBItemHead.COL_TITLE + "||" + DBBBItemHead.COL_AUTHOR
 						+ " LIKE ?", new String[] { "%" + filter + "%" }, null,
 				null, orderBy, limit);
 
 		try {
 			while (cursor.moveToNext()) {
-				list.add(new BBItemHeader(
-						cursor.getString(cursor
-								.getColumnIndexOrThrow(DBBBItemHeader.COL_ID_DATE)),
-						cursor.getString(cursor
-								.getColumnIndexOrThrow(DBBBItemHeader.COL_ID_INDEX)),
-						cursor.getString(cursor
-								.getColumnIndexOrThrow(DBBBItemHeader.COL_TITLE)),
-						cursor.getString(cursor
-								.getColumnIndexOrThrow(DBBBItemHeader.COL_AUTHOR)),
-						cursor.getInt(cursor
-								.getColumnIndexOrThrow(DBBBItemHeader.COL_IS_READ)),
-						cursor.getInt(cursor
-								.getColumnIndexOrThrow(DBBBItemHeader.COL_IS_NEW))));
+				list.add(new BBItemHead(
+						cursor.getString(cursor.getColumnIndexOrThrow(DBBBItemHead.COL_ID_DATE)),
+						cursor.getString(cursor.getColumnIndexOrThrow(DBBBItemHead.COL_ID_INDEX)),
+						cursor.getString(cursor.getColumnIndexOrThrow(DBBBItemHead.COL_DATE_SHOW)),
+						cursor.getString(cursor.getColumnIndexOrThrow(DBBBItemHead.COL_DATE_EXEC)),
+						cursor.getString(cursor.getColumnIndexOrThrow(DBBBItemHead.COL_TITLE)),
+						cursor.getString(cursor.getColumnIndexOrThrow(DBBBItemHead.COL_AUTHOR)),
+						cursor.getInt(cursor.getColumnIndexOrThrow(DBBBItemHead.COL_IS_READ)),
+						cursor.getInt(cursor.getColumnIndexOrThrow(DBBBItemHead.COL_IS_NEW))));
 			}
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
@@ -76,11 +76,11 @@ public class BBManager {
 		
 		return list;
 	}
-	public List<BBItemHeader> getBBItems(String limit) {
-		return getBBItems("", DBBBItemHeader.COL_ID_DATE, limit);
+	public List<BBItemHead> getHeads(String limit) {
+		return getHeads("", DBBBItemHead.COL_ID_DATE, limit);
 	}
-	public List<BBItemHeader> getBBItems(String orderBy, String limit) {
-		return getBBItems("", orderBy, limit);
+	public List<BBItemHead> getHeads(String orderBy, String limit) {
+		return getHeads("", orderBy, limit);
 	}
 	
 	
@@ -88,38 +88,73 @@ public class BBManager {
 	 * WEB 上から記事一覧を再取得
 	 * @return
 	 */
-	public int reloadBBItems() {
-		int count = mDBBBItemHeader.getCounts();
+	public int reloadHeads() {
+		int count = mDBBBItemHead.getCounts();
 		
-		List<BBItemHeader> obtained = mBBHandler.getAllBBItems();
-		Iterator<BBItemHeader> it = obtained.iterator();
+		List<BBItemHead> obtained = mBBHandler.getAllBBItems();
+		Iterator<BBItemHead> it = obtained.iterator();
 		
 		while(it.hasNext()) {
-			BBItemHeader item = it.next();
-			if( mDBBBItemHeader.findById(item.getIdDate(), item.getIdIndex()) == null ) {
-				mDBBBItemHeader.insert(item);
+			BBItemHead item = it.next();
+			if( mDBBBItemHead.findById(item.getIdDate(), item.getIdIndex()) == null ) {
+				mDBBBItemHead.insert(item);
 			} else {
-				mDBBBItemHeader.update(item);
+				mDBBBItemHead.update(item);
 			}
 		}
 		
-		return (mDBBBItemHeader.getCounts() - count);
+		return (mDBBBItemHead.getCounts() - count);
 	}
 	
 	/**
 	 * 記事の内容を取得
-	 * @param itemData
+	 * @param itemHead
 	 */
-//	public void getItemContent(BBItemHeader itemData) {
-//		mBBHandler.getBBItemContent(itemData);
-//	}
-	/*
-	 * TODO 記事の内容取得の部分を作成
-	 */
+	public BBItemBody loadBody(BBItemHead itemHead) {
+		BBItemBody itemBody = mDBBBItemBody.findById(itemHead.getIdDate(), itemHead.getIdIndex());
+		
+		// DB 未挿入の場合は新規インスタンスを作成
+		if( itemBody == null ) {
+			itemBody = new BBItemBody(itemHead.getIdDate(), itemHead.getIdIndex(), null, false);
+			mDBBBItemBody.insert(itemBody);
+		}
+		
+		// 内容未取得の場合は WEB から取得
+		if( !itemBody.getIsLoaded() ) {
+			itemBody = mBBHandler.getBBItemBody(itemHead);
+			mDBBBItemBody.update(itemBody);
+		}
+		
+		return itemBody;
+	}
 	
-	/*
-	 * TODO 記事内容を保持するクラス、およびそのマッピングを行う sqlite ヘルパーをつくる
+	/**
+	 * 記事の内容の再取得
 	 */
+	public BBItemBody reloadBody(BBItemHead itemHead) {
+		BBItemBody itemBody = mDBBBItemBody.findById(itemHead.getIdDate(), itemHead.getIdIndex());
+
+		// DB 未挿入の場合は新規インスタンスを作成
+		if( itemBody == null ) {
+			itemBody = new BBItemBody(itemHead.getIdDate(), itemHead.getIdIndex(), null, false);
+			mDBBBItemBody.insert(itemBody);
+		}
+
+		// 内容未取得の場合は WEB から取得
+		itemBody = mBBHandler.getBBItemBody(itemHead);
+		mDBBBItemBody.update(itemBody);
+		
+		return itemBody;
+	}
+	
+	/**
+	 * 記事の内容が取得済みか確認
+	 * @param item
+	 */
+	public boolean isBodyLoaded(BBItemHead itemHead) {
+		BBItemBody itemBody = mDBBBItemBody.findById(itemHead.getIdDate(), itemHead.getIdIndex());
+		return ((itemBody != null) ? itemBody.getIsLoaded() : false);
+	}
 	
 	
 }
