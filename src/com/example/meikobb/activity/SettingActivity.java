@@ -147,8 +147,7 @@ public class SettingActivity extends Activity {
 				MainActivity.initBBManager();
 				
 				// BBFragment リロード
-				Log.i("SettingActivity", "*****************************reload");
-				BBFragment.setReloadFragment(true);
+				BBFragment.setRequireReloadFragment(true);
 			}
 		}
 

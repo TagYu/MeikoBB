@@ -15,6 +15,14 @@ public class MainActivity extends Activity {
 	
 	/* メンバ */
 	
+	
+	/* コンストラクタ */
+	public MainActivity() {
+		super();
+		
+		// 初期化
+		initialize();
+	}
 
 	/* オーバーライドメソッド */
 	
@@ -25,8 +33,6 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		
-		
 		
 		
 		/*

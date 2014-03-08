@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.meikobb.R;
+import com.example.meikobb.manager.BBManager;
 
 public class BBFragment extends Fragment {
 	/*
@@ -15,7 +16,7 @@ public class BBFragment extends Fragment {
 	 */
 	
 	/* メンバ */
-	private static boolean bFlgReload;
+	private static boolean sRequireReload;
 	
 	
 	
@@ -42,7 +43,6 @@ public class BBFragment extends Fragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		Log.i("BBFragment", "*****************************onCreate");
 		
 		// 回転時に初期化しないようにする
 		setRetainInstance(true);
@@ -55,8 +55,55 @@ public class BBFragment extends Fragment {
 	 */
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.fragment_bb, container, false);
-		Log.i("BBFragment", "*****************************onCreateView");
+		final View view = inflater.inflate(R.layout.fragment_bb, container, false);
+		
+		/* 試作 */
+		int num = BBManager.reloadHeads();
+		Log.i("BBFragment", "num = "+num);
+//		(new AsyncTask<Void, Void, List<BBItemHead>>() {
+//
+//			/* バックグラウンドで処理 */
+//			@Override
+//			protected List<BBItemHead> doInBackground(Void... params) {
+//				
+//				// リスト取得
+//				int num = BBManager.reloadHeads();
+//				if( num < 0 ) {
+//					return null;
+//				}
+//				
+//				return BBManager.getHeads("10");
+//			}
+//			
+//			/* 処理完了時のリスナー */
+//			@Override
+//			protected void onPostExecute(final List<BBItemHead> list) {
+//				getActivity().runOnUiThread(new Runnable() {
+//					@Override
+//					public void run() {
+//						// 描画
+//						ListView listView = (ListView) view.findViewById(R.id.fragment_bb_list);
+//						
+//						ArrayAdapter<String> adapter = null;
+//						
+//						if( list == null ) {
+//							adapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item_test1, new String[]{"取得エラー"});
+//						} else {
+//							List<String> stringList = new ArrayList<String>();
+//							for(Object obj : list.toArray()) {
+//								BBItemHead item = (BBItemHead) obj;
+//								stringList.add(item.getTitle());
+//							}
+//							adapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item_test1, stringList);
+//						}
+//						
+//						listView.setAdapter(adapter);
+//					}
+//				});
+//			}
+//			
+//		}).execute();
+		
 		return view;
 	}
 	
@@ -69,8 +116,8 @@ public class BBFragment extends Fragment {
 		super.onResume();
 		
 		// フラグメントの再描画が必要な場合、再描画する
-		if( bFlgReload ) {
-			bFlgReload = false;
+		if( sRequireReload ) {
+			sRequireReload = false;
 			getFragmentManager().beginTransaction().replace(this.getId(), newInstance()).commit();
 			this.onDestroy();
 		}
@@ -86,8 +133,8 @@ public class BBFragment extends Fragment {
 	 * フラグメントを再描画するかどうかの設定
 	 * @param reload 再描画する場合 true, しない場合 false
 	 */
-	public static void setReloadFragment(boolean reload) {
-		bFlgReload = reload;
+	public static void setRequireReloadFragment(boolean reload) {
+		sRequireReload = reload;
 	}
 	
 }

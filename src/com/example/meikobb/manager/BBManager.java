@@ -12,13 +12,13 @@ import android.preference.PreferenceManager;
 import com.example.meikobb.activity.SettingActivity;
 import com.example.meikobb.model.BBItemBody;
 import com.example.meikobb.model.BBItemHead;
-import com.example.meikobb.sqlite.DBBBItemBody;
-import com.example.meikobb.sqlite.DBBBItemHead;
+import com.example.meikobb.sqlite.DatabaseHelper;
 
 public class BBManager {
-	static BBHandler mBBHandler;
-	static DBBBItemHead mDBBBItemHead;
-	static DBBBItemBody mDBBBItemBody;
+	static BBHandler sBBHandler;
+//	static DBBBItemHead sDBBBItemHead;
+//	static DBBBItemBody sDBBBItemBody;
+	static DatabaseHelper sDatabaseHelper;
 	
 	/* コンストラクタ */
 	public BBManager(Context context) {
@@ -31,14 +31,15 @@ public class BBManager {
 	 * @param context コンテキスト
 	 */
 	public static void initialize(Context context) {
-		mBBHandler = new BBHandler();
+		sBBHandler = new BBHandler();
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		String authID = prefs.getString(SettingActivity.PREF_KEY_AUTH_ID, "");
 		String authPW = prefs.getString(SettingActivity.PREF_KEY_AUTH_PW, "");
-		mBBHandler.initialize(authID, authPW);
+		sBBHandler.initialize(authID, authPW);
 
-		mDBBBItemHead = new DBBBItemHead(context);
-		mDBBBItemBody = new DBBBItemBody(context);
+//		sDBBBItemHead = (DBBBItemHead) DBBBItemHead.getInstsance(context);
+//		sDBBBItemBody = (DBBBItemBody) DBBBItemBody.getInstsance(context);
+		sDatabaseHelper = DatabaseHelper.getInstance(context);
 	}
 	
 	
@@ -49,27 +50,35 @@ public class BBManager {
 	 * @param limit 出力数の制限をSQL文で指定
 	 * @return DB から取得した記事のヘッダ情報のリスト
 	 */
-	public List<BBItemHead> getHeads(String filter, String orderBy, String limit) {
+	public static List<BBItemHead> getHeads(String filter, String orderBy, String limit) {
 		List<BBItemHead> list = new ArrayList<BBItemHead>();
 		
-		Cursor cursor = mDBBBItemHead.getReadableDatabase().query(
-				DBBBItemHead.TABLE_NAME,
+//		Cursor cursor = sDBBBItemHead.getReadableDatabase().query(
+//				DBBBItemHead.TABLE_NAME,
+//				null,
+//				"lower("+DBBBItemHead.COL_TITLE + ")||lower(" + DBBBItemHead.COL_AUTHOR+")"
+//						+ " LIKE ?", new String[] { "%" + filter + "%" }, null,
+//				null, orderBy, limit);
+//
+//		try {
+//			while (cursor.moveToNext()) {
+//				list.add(DBBBItemHead.cursorToObject(cursor));
+//			}
+//		} catch (IllegalArgumentException e) {
+//			e.printStackTrace();
+//		} finally {
+//			cursor.close();
+//		}
+		Cursor cursor = sDatabaseHelper.getReadableDatabase().query(
+				DatabaseHelper.BBItemHead_TABLE_NAME,
 				null,
-				"lower("+DBBBItemHead.COL_TITLE + ")||lower(" + DBBBItemHead.COL_AUTHOR+")"
+				"lower(" + DatabaseHelper.BBItemHead_COL_TITLE + ")||lower("
+						+ DatabaseHelper.BBItemHead_COL_AUTHOR + ")"
 						+ " LIKE ?", new String[] { "%" + filter + "%" }, null,
 				null, orderBy, limit);
-
 		try {
-			while (cursor.moveToNext()) {
-				list.add(new BBItemHead(
-						cursor.getString(cursor.getColumnIndexOrThrow(DBBBItemHead.COL_ID_DATE)),
-						cursor.getString(cursor.getColumnIndexOrThrow(DBBBItemHead.COL_ID_INDEX)),
-						cursor.getString(cursor.getColumnIndexOrThrow(DBBBItemHead.COL_DATE_SHOW)),
-						cursor.getString(cursor.getColumnIndexOrThrow(DBBBItemHead.COL_DATE_EXEC)),
-						cursor.getString(cursor.getColumnIndexOrThrow(DBBBItemHead.COL_TITLE)),
-						cursor.getString(cursor.getColumnIndexOrThrow(DBBBItemHead.COL_AUTHOR)),
-						cursor.getInt(cursor.getColumnIndexOrThrow(DBBBItemHead.COL_IS_READ)),
-						cursor.getInt(cursor.getColumnIndexOrThrow(DBBBItemHead.COL_IS_NEW))));
+			while( cursor.moveToNext() ) {
+				list.add(DatabaseHelper.BBItemHead_cursorToObject(cursor));
 			}
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
@@ -87,7 +96,7 @@ public class BBManager {
 	 * @param limit 出力数の制限をSQL文で指定
 	 * @return DB から取得した記事のヘッダ情報のリスト
 	 */
-	public List<BBItemHead> getHeads(String orderBy, String limit) {
+	public static List<BBItemHead> getHeads(String orderBy, String limit) {
 		return getHeads("", orderBy, limit);
 	}
 	
@@ -97,31 +106,50 @@ public class BBManager {
 	 * @param limit 出力数の制限をSQL文で指定
 	 * @return DB から取得した記事のヘッダ情報のリスト
 	 */
-	public List<BBItemHead> getHeads(String limit) {
-		return getHeads("", DBBBItemHead.COL_ID_DATE, limit);
+	public static List<BBItemHead> getHeads(String limit) {
+//		return getHeads("", DBBBItemHead.COL_ID_DATE, limit);
+		return getHeads("", sDatabaseHelper.BBItemHead_COL_ID_DATE, limit);
 	}
 	
 	
 	/**
 	 * WEB 上から記事一覧を再取得
-	 * @return 増えた記事の数
+	 * @return 増えた記事の数, 取得に失敗した場合は (-1)
 	 */
-	public int reloadHeads() {
-		int count = mDBBBItemHead.getCounts();
+	public static int reloadHeads() {
+//		int count = sDBBBItemHead.getCounts();
+		int count = sDatabaseHelper.BBItemHead_getCounts();
 		
-		List<BBItemHead> obtained = mBBHandler.getAllBBItems();
-		Iterator<BBItemHead> it = obtained.iterator();
-		
-		while(it.hasNext()) {
-			BBItemHead item = it.next();
-			if( mDBBBItemHead.findById(item.getIdDate(), item.getIdIndex()) == null ) {
-				mDBBBItemHead.insert(item);
-			} else {
-				mDBBBItemHead.update(item);
-			}
+		List<BBItemHead> obtained = sBBHandler.getAllBBItems();
+		if( obtained == null ) {
+			// 取得に失敗
+			return (-1);
 		}
 		
-		return (mDBBBItemHead.getCounts() - count);
+		Iterator<BBItemHead> it = obtained.iterator();
+		
+//		while(it.hasNext()) {
+//			BBItemHead item = it.next();
+//			if( sDBBBItemHead.findById(item.getIdDate(), item.getIdIndex()) == null ) {
+//				sDBBBItemHead.insert(item);
+//			} else {
+//				sDBBBItemHead.update(item);
+//			}
+//		}
+//		
+//		return (sDBBBItemHead.getCounts() - count);
+		
+		while (it.hasNext()) {
+			BBItemHead item = it.next();
+			if (sDatabaseHelper.BBItemHead_findById(item.getIdDate(),
+					item.getIdIndex()) == null) {
+				sDatabaseHelper.BBItemHead_insert(item);
+			} else {
+				sDatabaseHelper.BBItemHead_update(item);
+			}
+		}
+
+		return (sDatabaseHelper.BBItemHead_getCounts() - count);
 	}
 	
 	
@@ -130,19 +158,22 @@ public class BBManager {
 	 * @param itemHead 記事のヘッダ情報
 	 * @return WEB から取得した記事の内容
 	 */
-	public BBItemBody getBody(BBItemHead itemHead) {
-		BBItemBody itemBody = mDBBBItemBody.findById(itemHead.getIdDate(), itemHead.getIdIndex());
+	public static BBItemBody getBody(BBItemHead itemHead) {
+//		BBItemBody itemBody = sDBBBItemBody.findById(itemHead.getIdDate(), itemHead.getIdIndex());
+		BBItemBody itemBody = sDatabaseHelper.BBItemBody_findById(itemHead.getIdDate(), itemHead.getIdIndex());
 		
 		// DB 未挿入の場合は新規インスタンスを作成
 		if( itemBody == null ) {
 			itemBody = new BBItemBody(itemHead.getIdDate(), itemHead.getIdIndex(), null, false);
-			mDBBBItemBody.insert(itemBody);
+//			sDBBBItemBody.insert(itemBody);
+			sDatabaseHelper.BBItemBody_insert(itemBody);
 		}
 		
 		// 内容未取得の場合は WEB から取得
 		if( !itemBody.getIsLoaded() ) {
-			itemBody = mBBHandler.getBBItemBody(itemHead);
-			mDBBBItemBody.update(itemBody);
+			itemBody = sBBHandler.getBBItemBody(itemHead);
+//			sDBBBItemBody.update(itemBody);
+			sDatabaseHelper.BBItemBody_update(itemBody);
 		}
 		
 		return itemBody;
@@ -154,18 +185,21 @@ public class BBManager {
 	 * @param itemHead 記事のヘッダ情報
 	 * @return WEB から取得した記事の内容
 	 */
-	public BBItemBody reloadBody(BBItemHead itemHead) {
-		BBItemBody itemBody = mDBBBItemBody.findById(itemHead.getIdDate(), itemHead.getIdIndex());
+	public static BBItemBody reloadBody(BBItemHead itemHead) {
+//		BBItemBody itemBody = sDBBBItemBody.findById(itemHead.getIdDate(), itemHead.getIdIndex());
+		BBItemBody itemBody = sDatabaseHelper.BBItemBody_findById(itemHead.getIdDate(), itemHead.getIdIndex());
 
 		// DB 未挿入の場合は新規インスタンスを作成
 		if( itemBody == null ) {
 			itemBody = new BBItemBody(itemHead.getIdDate(), itemHead.getIdIndex(), null, false);
-			mDBBBItemBody.insert(itemBody);
+//			sDBBBItemBody.insert(itemBody);
+			sDatabaseHelper.BBItemBody_insert(itemBody);
 		}
 
 		// 内容未取得の場合は WEB から取得
-		itemBody = mBBHandler.getBBItemBody(itemHead);
-		mDBBBItemBody.update(itemBody);
+		itemBody = sBBHandler.getBBItemBody(itemHead);
+//		sDBBBItemBody.update(itemBody);
+		sDatabaseHelper.BBItemBody_update(itemBody);
 		
 		return itemBody;
 	}
@@ -176,8 +210,9 @@ public class BBManager {
 	 * @param itemHead 記事のヘッダ情報
 	 * @return 記事の内容が取得済みの場合 true, それ以外の場合 false
 	 */
-	public boolean isBodyLoaded(BBItemHead itemHead) {
-		BBItemBody itemBody = mDBBBItemBody.findById(itemHead.getIdDate(), itemHead.getIdIndex());
+	public static boolean isBodyLoaded(BBItemHead itemHead) {
+//		BBItemBody itemBody = sDBBBItemBody.findById(itemHead.getIdDate(), itemHead.getIdIndex());
+		BBItemBody itemBody = sDatabaseHelper.BBItemBody_findById(itemHead.getIdDate(), itemHead.getIdIndex());
 		return ((itemBody != null) ? itemBody.getIsLoaded() : false);
 	}
 	
