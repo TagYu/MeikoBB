@@ -8,9 +8,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.PreferenceFragment;
+import android.util.Log;
 import android.view.MenuItem;
 
 import com.example.meikobb.R;
+import com.example.meikobb.fragment.BBFragment;
 
 public class SettingActivity extends Activity {
 	
@@ -137,10 +139,16 @@ public class SettingActivity extends Activity {
 			// 設定値変更時のリスナーを解除
 			getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
 
-			// 認証情報に変更があれば、BBManager を初期化
+			// 認証情報に変更があれば、BBManager を初期化, BBFragment をリロード
 			if( mIsAuthValueChanged ) {
 				mIsAuthValueChanged = false;
+				
+				// BBManager 初期化
 				MainActivity.initBBManager();
+				
+				// BBFragment リロード
+				Log.i("SettingActivity", "*****************************reload");
+				BBFragment.setReloadFragment(true);
 			}
 		}
 

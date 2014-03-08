@@ -3,15 +3,18 @@ package com.example.meikobb.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.example.meikobb.R;
 import com.example.meikobb.application.MainApplication;
+import com.example.meikobb.fragment.BBFragment;
 import com.example.meikobb.manager.BBManager;
 
 public class MainActivity extends Activity {
+	
+	/* メンバ */
+	
 
 	/* オーバーライドメソッド */
 	
@@ -22,6 +25,16 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		
+		
+		
+		
+		/*
+		 * フラグメントを設定
+		 */
+		getFragmentManager().beginTransaction()
+				.replace(R.id.activity_main_fragment, BBFragment.newInstance())
+				.commit();
 	}
 
 	/**
