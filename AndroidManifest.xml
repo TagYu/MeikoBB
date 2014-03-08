@@ -9,6 +9,7 @@
         android:targetSdkVersion="19" />
 
     <application
+        android:name="com.example.meikobb.application.MainApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
@@ -21,6 +22,10 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name="com.example.meikobb.activity.SettingActivity"
+            android:label="@string/app_name" >
         </activity>
     </application>
 

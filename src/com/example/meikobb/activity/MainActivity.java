@@ -1,8 +1,11 @@
 package com.example.meikobb.activity;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 
 import com.example.meikobb.R;
 import com.example.meikobb.application.MainApplication;
@@ -23,12 +26,50 @@ public class MainActivity extends Activity {
 		return true;
 	}
 	
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		
+		switch(item.getItemId()) {
+		case R.id.action_settings: {
+			startActivity(new Intent(this, SettingActivity.class));
+		}
+		}
+		
+		return super.onOptionsItemSelected(item);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	/**
 	 * public static initialize()
 	 * MainActivity, Manager の初期化
 	 */
 	public static void initialize() {
 		// 初期化
+		initBBManager();
+	}
+	
+	
+	/**
+	 * BBManager の初期化
+	 */
+	public static void initBBManager() {
 		BBManager.initialize(MainApplication.getInstance());
 	}
 

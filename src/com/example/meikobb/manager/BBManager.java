@@ -9,7 +9,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.preference.PreferenceManager;
 
-import com.example.meikobb.activity.SettingsActivity;
+import com.example.meikobb.activity.SettingActivity;
 import com.example.meikobb.model.BBItemBody;
 import com.example.meikobb.model.BBItemHead;
 import com.example.meikobb.sqlite.DBBBItemBody;
@@ -33,8 +33,8 @@ public class BBManager {
 	public static void initialize(Context context) {
 		mBBHandler = new BBHandler();
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-		String authID = prefs.getString(SettingsActivity.PREF_KEY_AUTH_ID, "");
-		String authPW = prefs.getString(SettingsActivity.PREF_KEY_AUTH_PW, "");
+		String authID = prefs.getString(SettingActivity.PREF_KEY_AUTH_ID, "");
+		String authPW = prefs.getString(SettingActivity.PREF_KEY_AUTH_PW, "");
 		mBBHandler.initialize(authID, authPW);
 
 		mDBBBItemHead = new DBBBItemHead(context);
