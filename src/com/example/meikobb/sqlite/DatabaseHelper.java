@@ -76,7 +76,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			"  "+BBItemHead_COL_IS_READ+" INTEGER," +
 			"  "+BBItemHead_COL_IS_NEW+" INTEGER," +
 			"  PRIMARY KEY ("+BBItemHead_COL_ID_DATE+", "+BBItemHead_COL_ID_INDEX+")" +
-			");";
+			")";
 	
 	/* ---------------------------------------------------------------
 	 * BBItemBody
@@ -86,9 +86,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			"  "+BBItemBody_COL_ID_DATE+" TEXT," +
 			"  "+BBItemBody_COL_ID_INDEX+" TEXT," +
 			"  "+BBItemBody_COL_BODY+" TEXT," +
-			"  "+BBItemBody_COL_IS_LOADED+" INTEGER" +
+			"  "+BBItemBody_COL_IS_LOADED+" INTEGER," +
 			"  PRIMARY KEY ("+BBItemBody_COL_ID_DATE+", "+BBItemBody_COL_ID_INDEX+")" +
-			");";
+			")";
 	
 
 	/* メンバ */
@@ -250,7 +250,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	 */
 	public int BBItemHead_getCounts() {
 		Cursor cursor = getReadableDatabase().rawQuery("SELECT count(*) FROM "+BBItemHead_TABLE_NAME, new String[]{});
-		return cursor.moveToFirst() ? cursor.getInt(0) : (-1);
+		try {
+			return cursor.moveToFirst() ? cursor.getInt(0) : (-1);
+		} finally {
+			cursor.close();
+		}
 	}
 	
 	/**
@@ -259,6 +263,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	 * @return
 	 */
 	public static BBItemHead BBItemHead_cursorToObject(Cursor cursor) throws IllegalArgumentException {
+		if( cursor.isBeforeFirst() || cursor.isAfterLast() ) return null;
 		return new BBItemHead(
 				cursor.getString(cursor.getColumnIndexOrThrow(BBItemHead_COL_ID_DATE)),
 				cursor.getString(cursor.getColumnIndexOrThrow(BBItemHead_COL_ID_INDEX)),
@@ -402,7 +407,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	 */
 	public int BBItemBody_getCounts() {
 		Cursor cursor = getReadableDatabase().rawQuery("SELECT count(*) FROM "+BBItemBody_TABLE_NAME, new String[]{});
-		return cursor.moveToFirst() ? cursor.getInt(0) : (-1);
+		try {
+			return cursor.moveToFirst() ? cursor.getInt(0) : (-1);
+		} finally {
+			cursor.close();
+		}
 	}
 	
 	/**
@@ -411,6 +420,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	 * @return
 	 */
 	public static BBItemBody BBItemBody_cursorToObject(Cursor cursor) throws IllegalArgumentException {
+		if( cursor.isBeforeFirst() || cursor.isAfterLast() ) return null;
 		return new BBItemBody(
 				cursor.getString(cursor.getColumnIndexOrThrow(BBItemBody_COL_ID_DATE)),
 				cursor.getString(cursor.getColumnIndexOrThrow(BBItemBody_COL_ID_INDEX)),

@@ -37,8 +37,8 @@ public class BBHandler {
 	private LinkedHashMap<String, String> mAuthParams;
 	private String mAuthData;
 	
-	private HttpHandler_Header mHttpHandler_List;
-	private HttpHandler_Body mHttpHandler_Content;
+	private HttpHandler_Head mHttpHandler_Head;
+	private HttpHandler_Body mHttpHandler_Body;
 	
 	private long mLastLoginTestTime = 0;
 	
@@ -58,8 +58,8 @@ public class BBHandler {
 		
 		mAuthData = generateHttpData(mAuthParams);
 
-		mHttpHandler_List = new HttpHandler_Header();
-		mHttpHandler_Content = new HttpHandler_Body();
+		mHttpHandler_Head = new HttpHandler_Head();
+		mHttpHandler_Body = new HttpHandler_Body();
 		
 		mIsReady = true;
 	}
@@ -78,22 +78,23 @@ public class BBHandler {
 		}
 
 		CookieHandler.setDefault(mCookieManager);
-		parser.setContentHandler(mHttpHandler_List);
+		parser.setContentHandler(mHttpHandler_Head);
 		
 		try {
-			url = new URL("https://slboam.ict.nitech.ac.jp/openam/UI/Login");
+			url = new URL("https://rpxkeijiban.ict.nitech.ac.jp/keijiban/app?uri=loginTest&dummy=aaaa");
 			conn = (HttpsURLConnection) url.openConnection();
 			conn.setReadTimeout(10000);
 			conn.setConnectTimeout(15000);
 			conn.setDoOutput(true);
 			conn.setUseCaches(false);
-			conn.setRequestMethod("POST");
-			printWriter = new PrintWriter(conn.getOutputStream());
-			printWriter.write(mAuthData);
-			printWriter.close();
+			conn.setRequestMethod("GET");
+//			conn.setRequestMethod("POST");
+//			printWriter = new PrintWriter(conn.getOutputStream());
+//			printWriter.write(mAuthData);
+//			printWriter.close();
 			
 			response = conn.getResponseCode();
-			Log.i("BBHandler", "getAllBBItems(): GET https://slboam.ict.nitech.ac.jp/openam/UI/Login; Response: " + response);
+			Log.i("BBHandler", "getAllBBItems(): GET https://rpxkeijiban.ict.nitech.ac.jp/keijiban/app?uri=loginTest&dummy=aaaa; Response: " + response);
 			
 			parser.parse(new InputSource(new InputStreamReader(conn.getInputStream(), "Shift_JIS")));
 		} catch(IOException e) {
@@ -119,7 +120,8 @@ public class BBHandler {
 		}
 		
 		
-		List<BBItemHead> items = mHttpHandler_List.getBBItems();
+		List<BBItemHead> items = mHttpHandler_Head.getBBItems();
+		Log.i("BBHandler", items.size() + " items found");
 
 		return items;
 	}
@@ -149,7 +151,7 @@ public class BBHandler {
 		}
 		
 		CookieHandler.setDefault(mCookieManager);
-		parser.setContentHandler(mHttpHandler_Content);
+		parser.setContentHandler(mHttpHandler_Body);
 		
 		try {
 			url = new URL("https://rpxkeijiban.ict.nitech.ac.jp/keijiban/app?uri=keijiban&next_uri=detail&id_date="+id_date+"&id_index="+id_index);
@@ -185,7 +187,7 @@ public class BBHandler {
 			}
 		}
 		
-		itemBody.setBody(mHttpHandler_Content.getBody());
+		itemBody.setBody(mHttpHandler_Body.getBody());
 		itemBody.setIsLoaded(true);
 		
 		return itemBody;
@@ -340,7 +342,7 @@ public class BBHandler {
 	
 	
 	
-	private class HttpHandler_Header implements ContentHandler {
+	private class HttpHandler_Head implements ContentHandler {
 		
 		private int mDepth = 0;
 		private boolean mIsInTable = false;
