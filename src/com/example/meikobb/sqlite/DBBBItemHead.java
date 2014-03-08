@@ -27,6 +27,10 @@ public class DBBBItemHead extends DatabaseHelper {
 		super(context);
 	}
 	
+	
+	/**
+	 * テーブルの生成
+	 */
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		db.execSQL(
@@ -40,6 +44,10 @@ public class DBBBItemHead extends DatabaseHelper {
 				");");
 	}
 	
+	
+	/**
+	 * テーブルの再生成
+	 */
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		db.execSQL("DROP TABLE IF EXISTS "+TABLE_NAME);
@@ -51,6 +59,12 @@ public class DBBBItemHead extends DatabaseHelper {
 	
 	
 	/* アダプタメソッド */
+	/**
+	 * 主キーから一行（モデル）を取得
+	 * @param id_date 主キー
+	 * @param id_index 主キー
+	 * @return モデルのインスタンス, データベース内に存在しないとき null
+	 */
 	public BBItemHead findById(String id_date, String id_index) {
 		Cursor cursor = getReadableDatabase().query(
 				TABLE_NAME,
@@ -80,6 +94,11 @@ public class DBBBItemHead extends DatabaseHelper {
 	}
 	
 	
+	/**
+	 * モデルをデータベースに保存
+	 * @param item モデル
+	 * @throws SQLException
+	 */
 	public void insert(BBItemHead item) throws SQLException {
 		SQLiteDatabase db = getWritableDatabase();
 		
@@ -92,11 +111,24 @@ public class DBBBItemHead extends DatabaseHelper {
 		}
 	}
 	
+	
+	/**
+	 * データベース内のモデルを更新
+	 * @param item モデル
+	 * @param id_date 主キー
+	 * @param id_index 主キー
+	 */
 	public void update(BBItemHead item, String id_date, String id_index) {
 		item.setIdDate(id_date);
 		item.setIdIndex(id_index);
 		update(item);
 	}
+	
+	
+	/**
+	 * データベース内のモデルを更新
+	 * @param item モデル
+	 */
 	public void update(BBItemHead item) {
 		SQLiteDatabase db = getWritableDatabase();
 		
@@ -111,6 +143,11 @@ public class DBBBItemHead extends DatabaseHelper {
 		}
 	}
 	
+	
+	/**
+	 * データベース内の行数（保存されているモデルの数）を取得
+	 * @return テーブルの行数
+	 */
 	public int getCounts() {
 		Cursor cursor = getReadableDatabase().rawQuery("SELECT count(*) FROM "+TABLE_NAME, new String[]{});
 		return cursor.moveToFirst() ? cursor.getInt(0) : (-1);
@@ -119,6 +156,13 @@ public class DBBBItemHead extends DatabaseHelper {
 	
 	
 	
+	/* 非公開メソッド */
+	
+	/**
+	 * モデルをテーブルに格納するために、型を変換
+	 * @param item モデル
+	 * @return ContentValues
+	 */
 	private ContentValues generateContentValues(BBItemHead item) {
 		ContentValues v = new ContentValues();
 		

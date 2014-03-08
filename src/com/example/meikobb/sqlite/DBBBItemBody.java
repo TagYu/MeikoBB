@@ -24,6 +24,10 @@ public class DBBBItemBody extends DatabaseHelper {
 		super(context);
 	}
 	
+	
+	/**
+	 * テーブルの生成
+	 */
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		db.execSQL(
@@ -35,6 +39,10 @@ public class DBBBItemBody extends DatabaseHelper {
 				");");
 	}
 	
+	
+	/**
+	 * テーブルの再生成
+	 */
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		db.execSQL("DROP TABLE IF EXISTS "+TABLE_NAME);
@@ -46,6 +54,13 @@ public class DBBBItemBody extends DatabaseHelper {
 	
 	
 	/* アダプタメソッド */
+	
+	/**
+	 * 主キーから一行（モデル）を取得
+	 * @param id_date 主キー
+	 * @param id_index 主キー
+	 * @return モデルのインスタンス, データベース内に存在しないとき null
+	 */
 	public BBItemBody findById(String id_date, String id_index) {
 		Cursor cursor = getReadableDatabase().query(
 				TABLE_NAME,
@@ -71,6 +86,11 @@ public class DBBBItemBody extends DatabaseHelper {
 	}
 	
 	
+	/**
+	 * モデルをデータベースに保存
+	 * @param item モデル
+	 * @throws SQLException
+	 */
 	public void insert(BBItemBody item) throws SQLException {
 		SQLiteDatabase db = getWritableDatabase();
 		
@@ -83,11 +103,24 @@ public class DBBBItemBody extends DatabaseHelper {
 		}
 	}
 	
+	
+	/**
+	 * データベース内のモデルを更新
+	 * @param item モデル
+	 * @param id_date 主キー
+	 * @param id_index 主キー
+	 */
 	public void update(BBItemBody item, String id_date, String id_index) {
 		item.setIdDate(id_date);
 		item.setIdIndex(id_index);
 		update(item);
 	}
+	
+	
+	/**
+	 * データベース内のモデルを更新
+	 * @param item モデル
+	 */
 	public void update(BBItemBody item) {
 		SQLiteDatabase db = getWritableDatabase();
 		
@@ -102,6 +135,11 @@ public class DBBBItemBody extends DatabaseHelper {
 		}
 	}
 	
+	
+	/**
+	 * データベース内の行数（保存されているモデルの数）を取得
+	 * @return テーブルの行数
+	 */
 	public int getCounts() {
 		Cursor cursor = getReadableDatabase().rawQuery("SELECT count(*) FROM "+TABLE_NAME, new String[]{});
 		return cursor.moveToFirst() ? cursor.getInt(0) : (-1);
@@ -109,13 +147,21 @@ public class DBBBItemBody extends DatabaseHelper {
 
 	
 	
+
+	/* 非公開メソッド */
 	
+	/**
+	 * モデルをテーブルに格納するために、型を変換
+	 * @param item モデル
+	 * @return ContentValues
+	 */
 	private ContentValues generateContentValues(BBItemBody item) {
 		ContentValues v = new ContentValues();
 		
 		v.put(COL_ID_DATE, item.getIdDate());
 		v.put(COL_ID_INDEX, item.getIdIndex());
 		v.put(COL_BODY, item.getBody());
+		v.put(COL_IS_LOADED, item.getIsLoaded());
 		
 		return v;
 	}

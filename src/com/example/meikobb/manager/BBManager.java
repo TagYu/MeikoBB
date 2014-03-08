@@ -27,8 +27,8 @@ public class BBManager {
 	
 	
 	/**
-	 * initialize
-	 * @return
+	 * BBManager の初期化
+	 * @param context コンテキスト
 	 */
 	public static void initialize(Context context) {
 		mBBHandler = new BBHandler();
@@ -42,9 +42,12 @@ public class BBManager {
 	}
 	
 	
-	
 	/**
 	 * DB 内の記事一覧を取得
+	 * @param filter concat(記事タイトル, 著者) LIKE %filter%
+	 * @param orderBy 出力する順番をSQL文で指定
+	 * @param limit 出力数の制限をSQL文で指定
+	 * @return DB から取得した記事のヘッダ情報のリスト
 	 */
 	public List<BBItemHead> getHeads(String filter, String orderBy, String limit) {
 		List<BBItemHead> list = new ArrayList<BBItemHead>();
@@ -52,7 +55,7 @@ public class BBManager {
 		Cursor cursor = mDBBBItemHead.getReadableDatabase().query(
 				DBBBItemHead.TABLE_NAME,
 				null,
-				DBBBItemHead.COL_TITLE + "||" + DBBBItemHead.COL_AUTHOR
+				"lower("+DBBBItemHead.COL_TITLE + ")||lower(" + DBBBItemHead.COL_AUTHOR+")"
 						+ " LIKE ?", new String[] { "%" + filter + "%" }, null,
 				null, orderBy, limit);
 
@@ -76,17 +79,32 @@ public class BBManager {
 		
 		return list;
 	}
-	public List<BBItemHead> getHeads(String limit) {
-		return getHeads("", DBBBItemHead.COL_ID_DATE, limit);
-	}
+	
+	
+	/**
+	 * DB 内の記事一覧を取得
+	 * @param orderBy 出力する順番をSQL文で指定
+	 * @param limit 出力数の制限をSQL文で指定
+	 * @return DB から取得した記事のヘッダ情報のリスト
+	 */
 	public List<BBItemHead> getHeads(String orderBy, String limit) {
 		return getHeads("", orderBy, limit);
 	}
 	
 	
 	/**
+	 * DB 内の記事一覧を取得
+	 * @param limit 出力数の制限をSQL文で指定
+	 * @return DB から取得した記事のヘッダ情報のリスト
+	 */
+	public List<BBItemHead> getHeads(String limit) {
+		return getHeads("", DBBBItemHead.COL_ID_DATE, limit);
+	}
+	
+	
+	/**
 	 * WEB 上から記事一覧を再取得
-	 * @return
+	 * @return 増えた記事の数
 	 */
 	public int reloadHeads() {
 		int count = mDBBBItemHead.getCounts();
@@ -106,11 +124,13 @@ public class BBManager {
 		return (mDBBBItemHead.getCounts() - count);
 	}
 	
+	
 	/**
 	 * 記事の内容を取得
-	 * @param itemHead
+	 * @param itemHead 記事のヘッダ情報
+	 * @return WEB から取得した記事の内容
 	 */
-	public BBItemBody loadBody(BBItemHead itemHead) {
+	public BBItemBody getBody(BBItemHead itemHead) {
 		BBItemBody itemBody = mDBBBItemBody.findById(itemHead.getIdDate(), itemHead.getIdIndex());
 		
 		// DB 未挿入の場合は新規インスタンスを作成
@@ -128,8 +148,11 @@ public class BBManager {
 		return itemBody;
 	}
 	
+	
 	/**
 	 * 記事の内容の再取得
+	 * @param itemHead 記事のヘッダ情報
+	 * @return WEB から取得した記事の内容
 	 */
 	public BBItemBody reloadBody(BBItemHead itemHead) {
 		BBItemBody itemBody = mDBBBItemBody.findById(itemHead.getIdDate(), itemHead.getIdIndex());
@@ -147,9 +170,11 @@ public class BBManager {
 		return itemBody;
 	}
 	
+	
 	/**
 	 * 記事の内容が取得済みか確認
-	 * @param item
+	 * @param itemHead 記事のヘッダ情報
+	 * @return 記事の内容が取得済みの場合 true, それ以外の場合 false
 	 */
 	public boolean isBodyLoaded(BBItemHead itemHead) {
 		BBItemBody itemBody = mDBBBItemBody.findById(itemHead.getIdDate(), itemHead.getIdIndex());

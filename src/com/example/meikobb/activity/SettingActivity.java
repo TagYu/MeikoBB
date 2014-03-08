@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.PreferenceFragment;
@@ -18,6 +19,11 @@ public class SettingActivity extends Activity {
 	public static final String PREF_KEY_AUTH_PW = "auth_pw";
 	
 
+	/* オーバーライドメソッド */
+	
+	/**
+	 * アクティビティ生成時に呼ばれる
+	 */
 	@SuppressLint("NewApi")
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -25,16 +31,21 @@ public class SettingActivity extends Activity {
 		getFragmentManager().beginTransaction().replace(android.R.id.content, new SettingFragment()).commit();
 		
 		// アクションバー　アイコンの「戻る」機能追加
-		getActionBar().setHomeButtonEnabled(true);
+		if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH ) {
+			getActionBar().setHomeButtonEnabled(true);
+		}
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 	}
 	
+	/**
+	 * オプションメニューの項目が押されたときに呼ばれる
+	 */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch(item.getItemId()) {
 		case android.R.id.home: {
+			// 左上のアイコンが押された --> SettingActivity 終了
 			finish();
-			
 			return true;
 		}
 		}
@@ -42,18 +53,32 @@ public class SettingActivity extends Activity {
 		return super.onOptionsItemSelected(item);
 	}
 	
+	/**
+	 * 別のアクティビティへ遷移したときに呼ばれる
+	 */
+	@Override
+	public void onPause() {
+		super.onPause();
+	}
 	
 	
 	
-	
-	
+	/*
+	 * SettingFragment ： SettingActivity 内のフラグメント
+	 */
 	public static class SettingFragment extends PreferenceFragment implements OnSharedPreferenceChangeListener {
 
 		/* メンバ */
 		private boolean mIsAuthValueChanged;
 		
 		
-		// フラグメント生成時に呼ばれる
+		/* オーバーライドメソッド */
+		
+		/**
+		 * (non-Javadoc)
+		 *  フラグメント生成時に呼ばれる。
+		 * @see android.preference.PreferenceFragment#onCreate(android.os.Bundle)
+		 */
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
@@ -72,7 +97,9 @@ public class SettingActivity extends Activity {
 		}
 		
 		
-		// 設定値が変更されたときに呼ばれる
+		/**
+		 * 設定値が変更されたときに呼ばれる
+		 */
 		@Override
 		public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 			
@@ -89,18 +116,27 @@ public class SettingActivity extends Activity {
 		}
 		
 		
+		/**
+		 * このフラグメントに遷移した時に呼ばれる
+		 */
 		@Override
 		public void onResume() {
 			super.onResume();
+			
+			// 設定値変更時のリスナーを設定
 			getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
 		}
 		
+		/**
+		 * 別のフラグメントへ遷移したときに呼ばれる
+		 */
 		@Override
 		public void onPause() {
 			super.onPause();
+			
+			// 設定値変更時のリスナーを解除
 			getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
 
-			
 			// 認証情報に変更があれば、BBManager を初期化
 			if( mIsAuthValueChanged ) {
 				mIsAuthValueChanged = false;
@@ -108,13 +144,6 @@ public class SettingActivity extends Activity {
 			}
 		}
 
-	}
-	
-	
-	
-	@Override
-	public void onPause() {
-		super.onPause();
 	}
 	
 }

@@ -13,12 +13,20 @@ import com.example.meikobb.manager.BBManager;
 
 public class MainActivity extends Activity {
 
+	/* オーバーライドメソッド */
+	
+	/**
+	 * アクティビティ生成時に呼ばれる
+	 */
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 	}
 
+	/**
+	 * オプションメニュー生成時に呼ばれる
+	 */
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -26,7 +34,9 @@ public class MainActivity extends Activity {
 		return true;
 	}
 	
-	
+	/**
+	 * オプションメニューの項目が押されたときに呼ばれる
+	 */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		
@@ -53,15 +63,13 @@ public class MainActivity extends Activity {
 	
 	
 	
-	
-	
+	/* 勝手に作ったメソッド */
 	
 	/**
-	 * public static initialize()
-	 * MainActivity, Manager の初期化
+	 * MainActivity の初期化
 	 */
 	public static void initialize() {
-		// 初期化
+		// BBManager の初期化
 		initBBManager();
 	}
 	

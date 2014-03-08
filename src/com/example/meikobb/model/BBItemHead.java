@@ -11,10 +11,15 @@ public class BBItemHead implements Comparable {
 	private boolean mIsNew = true;
 	
 	public BBItemHead() { }
-	public BBItemHead(String idDate, String idIndex, String dateShow, String dateExec, String title, String author, int isRead, int isNew) {
+
+	public BBItemHead(String idDate, String idIndex, String dateShow,
+			String dateExec, String title, String author, int isRead, int isNew) {
 		this(idDate, idIndex, dateShow, dateExec, title, author, (isRead != 0), (isNew != 0));
 	}
-	public BBItemHead(String idDate, String idIndex, String dateShow, String dateExec, String title, String author, boolean isRead, boolean isNew) {
+
+	public BBItemHead(String idDate, String idIndex, String dateShow,
+			String dateExec, String title, String author, boolean isRead,
+			boolean isNew) {
 		this.mIdDate = idDate;
 		this.mIdIndex = idIndex;
 		this.mDateShow = dateShow;
