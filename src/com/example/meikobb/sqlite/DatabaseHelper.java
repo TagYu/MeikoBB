@@ -1,15 +1,15 @@
 package com.example.meikobb.sqlite;
 
-import com.example.meikobb.model.BBItemBody;
-import com.example.meikobb.model.BBItemHead;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
+
+import com.example.meikobb.model.BBItemBody;
+import com.example.meikobb.model.BBItemHead;
 
 /*
  * 参考：
@@ -71,6 +71,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			"CREATE TABLE "+BBItemHead_TABLE_NAME+" (" +
 			"  "+BBItemHead_COL_ID_DATE+" TEXT," +
 			"  "+BBItemHead_COL_ID_INDEX+" TEXT," +
+			"  "+BBItemHead_COL_DATE_SHOW+" TEXT," +
+			"  "+BBItemHead_COL_DATE_EXEC+" TEXT," +
 			"  "+BBItemHead_COL_TITLE+" TEXT," +
 			"  "+BBItemHead_COL_AUTHOR+" TEXT," +
 			"  "+BBItemHead_COL_IS_READ+" INTEGER," +
@@ -207,8 +209,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		
 		db.beginTransaction();
 		try {
-			db.insertOrThrow(BBItemHead_TABLE_NAME, null, BBItemHead_generateContentValues(item));
-			db.setTransactionSuccessful();
+			ContentValues v = BBItemHead_generateContentValues(item);
+			long res = db.insert(BBItemHead_TABLE_NAME, null, v);
+			Log.i("DatabaseHelper", "insert(): res="+res);
+			//db.setTransactionSuccessful();
 		} finally {
 			db.endTransaction();
 		}

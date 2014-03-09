@@ -1,5 +1,6 @@
 package com.example.meikobb.manager;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -88,15 +89,19 @@ public class BBHandler {
 			conn.setDoOutput(true);
 			conn.setUseCaches(false);
 			conn.setRequestMethod("GET");
-//			conn.setRequestMethod("POST");
-//			printWriter = new PrintWriter(conn.getOutputStream());
-//			printWriter.write(mAuthData);
-//			printWriter.close();
+			conn.setInstanceFollowRedirects(false);
 			
 			response = conn.getResponseCode();
 			Log.i("BBHandler", "getAllBBItems(): GET https://rpxkeijiban.ict.nitech.ac.jp/keijiban/app?uri=loginTest&dummy=aaaa; Response: " + response);
 			
 			parser.parse(new InputSource(new InputStreamReader(conn.getInputStream(), "Shift_JIS")));
+//			StringBuilder sb = new StringBuilder();
+//			char[] buf = new char[1024];
+//			BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), "Shift_JIS"));
+//			while(in.read(buf) >= 0) {
+//				sb.append(buf);
+//			}
+//			Log.i("BBHandler", sb.toString());
 		} catch(IOException e) {
 			Log.e("BBHandler", "IO Exception");
 			e.printStackTrace();
@@ -159,6 +164,7 @@ public class BBHandler {
 			conn.setReadTimeout(10000);
 			conn.setConnectTimeout(15000);
 			conn.setRequestMethod("GET");
+			conn.setInstanceFollowRedirects(false);
 			
 			response = conn.getResponseCode();
 			Log.i("BBHandler", "getBBItemContent(): GET https://rpxkeijiban.ict.nitech.ac.jp/keijiban/app?uri=keijiban&next_uri=detail&id_date="+id_date+"&id_index="+id_index+"; Response: " + response);
@@ -202,6 +208,8 @@ public class BBHandler {
 		BufferedReader bufferedReader = null;
 		
 		if( !mIsReady ) return false;
+		
+		Log.i("BBHandler", "login() : attempting to login");
 		// 一定時間経過していなければログインしていると判断（無駄なリクエストを抑える）
 		long lTmp = System.currentTimeMillis();
 		if( lTmp - mLastLoginTestTime < 5000 ) {
@@ -209,6 +217,7 @@ public class BBHandler {
 			mLastLoginTestTime = lTmp;
 			return true;
 		}
+		Log.i("BBHandler", "login() : do login");
 
 		CookieHandler.setDefault(mCookieManager);
 		
@@ -230,12 +239,13 @@ public class BBHandler {
 			conn.setDoOutput(true);
 			conn.setUseCaches(false);
 			conn.setRequestMethod("POST");
+			conn.setInstanceFollowRedirects(true);
 			printWriter = new PrintWriter(conn.getOutputStream());
 			printWriter.write(mAuthData);
 			printWriter.close();
 			
 			response = conn.getResponseCode();
-			Log.i("BBHandler", "login(): GET https://slboam.ict.nitech.ac.jp/openam/UI/Login; Response: " + response);
+			Log.i("BBHandler", "login(): POST https://slboam.ict.nitech.ac.jp/openam/UI/Login; Response: " + response);
 			if( response != 200 ) { throw new Exception(); }
 		} catch(IOException e) {
 			Log.e("BBHandler", "IO Exception");
@@ -290,10 +300,12 @@ public class BBHandler {
 			conn.setReadTimeout(10000);
 			conn.setConnectTimeout(15000);
 			conn.setRequestMethod("GET");
+			conn.setInstanceFollowRedirects(false);
 			
 			response = conn.getResponseCode();
 			Log.i("BBHandler", "loginCheck(): GET https://rpxkeijiban.ict.nitech.ac.jp/keijiban/app?uri=login_check; Response: " + response);
 			if( response == 200 ) return true;
+			else if( response == 302 ) return false;
 			else if( response == 304 ) return false;
 			else { throw new Exception(); }
 

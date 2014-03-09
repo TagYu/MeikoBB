@@ -7,7 +7,9 @@ import java.util.List;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import com.example.meikobb.activity.SettingActivity;
 import com.example.meikobb.model.BBItemBody;
@@ -110,9 +112,19 @@ public class BBManager {
 			BBItemHead item = it.next();
 			if (sDatabaseHelper.BBItemHead_findById(item.getIdDate(),
 					item.getIdIndex()) == null) {
-				sDatabaseHelper.BBItemHead_insert(item);
+				try {
+					sDatabaseHelper.BBItemHead_insert(item);
+				} catch (SQLException e) {
+					Log.i("BBManager", "SQLException: ");
+					e.printStackTrace();
+				}
 			} else {
-				sDatabaseHelper.BBItemHead_update(item);
+				try {
+					sDatabaseHelper.BBItemHead_update(item);
+				} catch (SQLException e) {
+					Log.i("BBManager", "SQLException: ");
+					e.printStackTrace();
+				}
 			}
 		}
 
