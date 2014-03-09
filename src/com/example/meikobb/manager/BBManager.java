@@ -91,7 +91,7 @@ public class BBManager {
 	 * @return DB から取得した記事のヘッダ情報のリスト
 	 */
 	public static List<BBItemHead> getHeads(String limit) {
-		return getHeads("", sDatabaseHelper.BBItemHead_COL_ID_DATE, limit);
+		return getHeads("", sDatabaseHelper.BBItemHead_DEFAULT_ORDER_BY, limit);
 	}
 	
 	
@@ -100,7 +100,7 @@ public class BBManager {
 	 * @return DB から取得した記事のヘッダ情報のリスト
 	 */
 	public static List<BBItemHead> getHeads() {
-		return getHeads("", sDatabaseHelper.BBItemHead_COL_ID_DATE, null);
+		return getHeads("", sDatabaseHelper.BBItemHead_DEFAULT_ORDER_BY, null);
 	}
 	
 	/**

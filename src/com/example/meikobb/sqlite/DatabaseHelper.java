@@ -37,6 +37,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	public static final String BBItemHead_COL_IS_READ = "is_read";
 	public static final String BBItemHead_COL_IS_NEW = "is_new";
 	
+	public static final String BBItemHead_DEFAULT_ORDER_BY = BBItemHead_COL_ID_DATE + " DESC, " + BBItemHead_COL_ID_INDEX + " DESC";
+	
 	/* ---------------------------------------------------------------
 	 * BBItemBody
 	 * --------------------------------------------------------------- */
