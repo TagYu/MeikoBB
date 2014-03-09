@@ -103,6 +103,14 @@ public class BBManager {
 		return getHeads("", sDatabaseHelper.BBItemHead_COL_ID_DATE, null);
 	}
 	
+	/**
+	 * DB 内の記事のヘッダ情報を取得
+	 * @return DB から取得した記事のヘッダ情報のリスト
+	 */
+	public static BBItemHead getHead(String idDate, String idIndex) {
+		return sDatabaseHelper.BBItemHead_findById(idDate, idIndex);
+	}
+	
 	
 	/**
 	 * WEB 上から記事一覧を再取得

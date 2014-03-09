@@ -183,16 +183,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	 * --------------------------------------------------------------- */
 	/**
 	 * 主キーから一行（モデル）を取得
-	 * @param id_date 主キー
-	 * @param id_index 主キー
+	 * @param idDate 主キー
+	 * @param idIndex 主キー
 	 * @return モデルのインスタンス, データベース内に存在しないとき null
 	 */
-	public BBItemHead BBItemHead_findById(String id_date, String id_index) {
+	public BBItemHead BBItemHead_findById(String idDate, String idIndex) {
 		Cursor cursor = getReadableDatabase().query(
 				BBItemHead_TABLE_NAME,
 				null,
 				BBItemHead_COL_ID_DATE + " = ? AND " + BBItemHead_COL_ID_INDEX + " = ?",
-				new String[]{ id_date, id_index },
+				new String[]{ idDate, idIndex },
 				null,
 				null, null, "1");
 		
@@ -227,12 +227,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	/**
 	 * データベース内のモデルを更新
 	 * @param item モデル
-	 * @param id_date 主キー
+	 * @param idDate 主キー
 	 * @param id_index 主キー
 	 */
-	public void BBItemHead_update(BBItemHead item, String id_date, String id_index) {
-		item.setIdDate(id_date);
-		item.setIdIndex(id_index);
+	public void BBItemHead_update(BBItemHead item, String idDate, String idIndex) {
+		item.setIdDate(idDate);
+		item.setIdIndex(idIndex);
 		BBItemHead_update(item);
 	}
 	
@@ -338,16 +338,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	
 	/**
 	 * 主キーから一行（モデル）を取得
-	 * @param id_date 主キー
-	 * @param id_index 主キー
+	 * @param idDate 主キー
+	 * @param idIndex 主キー
 	 * @return モデルのインスタンス, データベース内に存在しないとき null
 	 */
-	public BBItemBody BBItemBody_findById(String id_date, String id_index) {
+	public BBItemBody BBItemBody_findById(String idDate, String idIndex) {
 		Cursor cursor = getReadableDatabase().query(
 				BBItemBody_TABLE_NAME,
 				null,
 				BBItemBody_COL_ID_DATE + " = ? AND " + BBItemBody_COL_ID_INDEX + " = ?",
-				new String[]{ id_date, id_index },
+				new String[]{ idDate, idIndex },
 				null,
 				null, null, "1");
 
@@ -381,12 +381,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	/**
 	 * データベース内のモデルを更新
 	 * @param item モデル
-	 * @param id_date 主キー
-	 * @param id_index 主キー
+	 * @param idDate 主キー
+	 * @param idIndex 主キー
 	 */
-	public void BBItemBody_update(BBItemBody item, String id_date, String id_index) {
-		item.setIdDate(id_date);
-		item.setIdIndex(id_index);
+	public void BBItemBody_update(BBItemBody item, String idDate, String idIndex) {
+		item.setIdDate(idDate);
+		item.setIdIndex(idIndex);
 		BBItemBody_update(item);
 	}
 	

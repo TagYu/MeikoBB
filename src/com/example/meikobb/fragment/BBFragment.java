@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -56,62 +58,19 @@ public class BBFragment extends Fragment {
 	}
 	
 	
-	/**
-	 * フラグメントのビュー生成時に呼ばれる
-	 */
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		final View view = inflater.inflate(R.layout.fragment_bb, container, false);
-		
-		/* 試作 */
-		(new AsyncTask<Void, Void, List<BBItemHead>>() {
-
-			/* バックグラウンドで処理 */
-			@Override
-			protected List<BBItemHead> doInBackground(Void... params) {
-				
-				// リスト取得
-				int num = BBManager.reloadHeads();
-				if( num < 0 ) {
-					return null;
-				}
-				
-				return BBManager.getHeads(null);
-			}
-			
-			/* 処理完了時のリスナー */
-			@Override
-			protected void onPostExecute(final List<BBItemHead> list) {
-				getActivity().runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						// 描画
-						ListView listView = (ListView) view.findViewById(R.id.fragment_bb_list);
-						
-						ArrayAdapter<String> adapter = null;
-						
-						if( list == null ) {
-							adapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item_test1, new String[]{"取得エラー"});
-						} else {
-							List<String> stringList = new ArrayList<String>();
-							for(Object obj : list.toArray()) {
-								BBItemHead item = (BBItemHead) obj;
-								stringList.add(item.getTitle());
-							}
-							adapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item_test1, stringList);
-						}
-						
-						listView.setAdapter(adapter);
-					}
-				});
-			}
-			
-		}).execute();
-		
-		
-		
-		return view;
-	}
+//	※ オーバーライドして実装
+//	
+//	/**
+//	 * フラグメントのビュー生成時に呼ばれる
+//	 */
+//	@Override
+//	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+//		final View view = inflater.inflate(R.layout.fragment_bb, container, false);
+//		
+//		// ビューの作成
+//		
+//		return view;
+//	}
 	
 	
 	/**
@@ -124,7 +83,7 @@ public class BBFragment extends Fragment {
 		// フラグメントの再描画が必要な場合、再描画する
 		if( sRequireReload ) {
 			sRequireReload = false;
-			getFragmentManager().beginTransaction().replace(this.getId(), newInstance()).commit();
+			this.onReload();
 			this.onDestroy();
 		}
 	}
@@ -141,6 +100,15 @@ public class BBFragment extends Fragment {
 	 */
 	public static void setRequireReloadFragment(boolean reload) {
 		sRequireReload = reload;
+	}
+	
+	
+	/**
+	 * フラグメント再描画を行う際に呼ぶ
+	 * ※ サブクラスはこのメソッドをオーバーライドする必要がある
+	 */
+	protected void onReload() {
+		getFragmentManager().beginTransaction().replace(this.getId(), newInstance()).commit();
 	}
 	
 }

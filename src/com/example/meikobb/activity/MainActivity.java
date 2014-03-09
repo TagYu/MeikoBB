@@ -8,7 +8,7 @@ import android.view.MenuItem;
 
 import com.example.meikobb.R;
 import com.example.meikobb.application.MainApplication;
-import com.example.meikobb.fragment.BBFragment;
+import com.example.meikobb.fragment.BBListFragment;
 import com.example.meikobb.manager.BBManager;
 
 public class MainActivity extends Activity {
@@ -39,7 +39,7 @@ public class MainActivity extends Activity {
 		 * フラグメントを設定
 		 */
 		getFragmentManager().beginTransaction()
-				.replace(R.id.activity_main_fragment, BBFragment.newInstance())
+				.replace(R.id.activity_main_fragment, BBListFragment.newInstance())
 				.commit();
 	}
 

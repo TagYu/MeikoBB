@@ -8,8 +8,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity" >
 
-    <fragment
-        android:name="com.example.meikobb.fragment.BBFragment"
+    <FrameLayout
         android:id="@+id/activity_main_fragment"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" />
