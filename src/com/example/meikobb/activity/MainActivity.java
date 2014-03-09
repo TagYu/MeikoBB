@@ -1,6 +1,7 @@
 package com.example.meikobb.activity;
 
 import android.app.Activity;
+import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -38,9 +39,12 @@ public class MainActivity extends Activity {
 		/*
 		 * フラグメントを設定
 		 */
-		getFragmentManager().beginTransaction()
-				.replace(R.id.activity_main_fragment, BBListFragment.newInstance())
-				.commit();
+		FragmentManager fm = getFragmentManager();
+		if( fm.findFragmentById(R.id.activity_main_fragment) == null ) {
+			fm.beginTransaction()
+					.replace(R.id.activity_main_fragment, BBListFragment.newInstance())
+					.commit();
+		}
 	}
 
 	/**
@@ -103,5 +107,7 @@ public class MainActivity extends Activity {
 	
 	/*
 	 * TODO Activity をつくる
+	 *  - 最初のフラグメント遷移の部分・・・
+	 *    - 設定値が空・無効の時は別の(メッセージ用の)フラグメントを出す？
 	 */
 }
