@@ -82,7 +82,19 @@ public class BBHandler {
 		parser.setContentHandler(mHttpHandler_Head);
 		
 		try {
-			url = new URL("https://rpxkeijiban.ict.nitech.ac.jp/keijiban/app?uri=loginTest&dummy=aaaa");
+			/*
+			 * URL: https://rpxkeijiban.ict.nitech.ac.jp/keijiban/app?uri=keijiban&next_uri&event_code=reload&no_read=false&on_flag=false&reference_flag=false&order=info.bulletin_start_date&order_kind=desc
+			 *  - params:
+			 *    - uri=keijiban : （必須）
+			 *    - next_uri= :
+			 *    - event_code=reload : (空でも問題なかった）
+			 *    - no_read : 既読非表示(true), それ以外(false)
+			 *    - on_flag : 強調のみ表示(true), それ以外(false)
+			 *    - reference_flag : 参考非表示(true), それ以外(false)
+			 *    - order=info.bulletin_start_date : ORDER BY 句
+			 *    - order_kind=desc : 降順、昇順
+			 */
+			url = new URL("https://rpxkeijiban.ict.nitech.ac.jp/keijiban/app?uri=keijiban&no_read=false&on_flag=false&reference_flag=false&order=info.bulletin_start_date&order_kind=desc");
 			conn = (HttpsURLConnection) url.openConnection();
 			conn.setReadTimeout(10000);
 			conn.setConnectTimeout(15000);
@@ -92,7 +104,7 @@ public class BBHandler {
 			conn.setInstanceFollowRedirects(false);
 			
 			response = conn.getResponseCode();
-			Log.i("BBHandler", "getAllBBItems(): GET https://rpxkeijiban.ict.nitech.ac.jp/keijiban/app?uri=loginTest&dummy=aaaa; Response: " + response);
+			Log.i("BBHandler", "getAllBBItems(): GET https://rpxkeijiban.ict.nitech.ac.jp/keijiban/app?uri=keijiban&no_read=false&on_flag=false&reference_flag=false&order=info.bulletin_start_date&order_kind=desc Response: " + response);
 			
 			parser.parse(new InputSource(new InputStreamReader(conn.getInputStream(), "Shift_JIS")));
 		} catch(IOException e) {
