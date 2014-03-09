@@ -13,6 +13,7 @@ import android.view.MenuItem;
 
 import com.example.meikobb.R;
 import com.example.meikobb.fragment.BBFragment;
+import com.example.meikobb.manager.BBManager;
 
 public class SettingActivity extends Activity {
 	
@@ -148,6 +149,9 @@ public class SettingActivity extends Activity {
 				
 				// BBFragment リロード
 				BBFragment.setRequireReloadFragment(true);
+				
+				// 保存されたキャッシュをすべて削除
+				BBManager.deleteAllCaches();
 			}
 		}
 

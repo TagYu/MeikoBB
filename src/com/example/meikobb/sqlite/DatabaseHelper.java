@@ -169,7 +169,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	
 	
 	
-	
+	/* ===============================================================
+	 *  データベース全般のメソッド
+	 * =============================================================== */
+	public void refreshAllTables() {
+		SQLiteDatabase db = getWritableDatabase();
+		
+		db.execSQL("DELETE FROM "+BBItemHead_TABLE_NAME);
+		db.execSQL("DELETE FROM "+BBItemBody_TABLE_NAME);
+	}
 	
 	
 	

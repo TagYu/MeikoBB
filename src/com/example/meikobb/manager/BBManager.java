@@ -208,4 +208,13 @@ public class BBManager {
 	}
 	
 	
+	/**
+	 * キャッシュをすべて削除
+	 *   データベース内に保存されたキャッシュをすべて削除
+	 */
+	public static void deleteAllCaches() {
+		sDatabaseHelper.refreshAllTables();
+	}
+	
+	
 }
