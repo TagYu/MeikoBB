@@ -1,8 +1,8 @@
 package com.example.meikobb.fragment;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -95,23 +95,26 @@ public class BBListFragment extends BBFragment {
 			/* 処理完了時のリスナー */
 			@Override
 			protected void onPostExecute(final List<BBItemHead> list) {
-				getActivity().runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						// 描画
-						ListView tmplistView = (ListView) view.findViewById(R.id.fragment_bb_list_listview);
-						
-						BBListAdapter adapter;
-						
-						if( list == null ) {
-							adapter = new BBListAdapter(getActivity(), 0, new BBItemHead[]{new BBItemHead("", "", "", "", "取得エラー", "", false, false)});
-						} else {
-							adapter = new BBListAdapter(getActivity(), 0, list);
+				Activity activity;
+				if( (activity = getActivity()) != null ) {
+					activity.runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							// 描画
+							ListView tmplistView = (ListView) view.findViewById(R.id.fragment_bb_list_listview);
+							
+							BBListAdapter adapter;
+							
+							if( list == null ) {
+								adapter = new BBListAdapter(getActivity(), 0, new BBItemHead[]{new BBItemHead("", "", "", "", "取得エラー", "", false, false)});
+							} else {
+								adapter = new BBListAdapter(getActivity(), 0, list);
+							}
+							
+							tmplistView.setAdapter(adapter);
 						}
-						
-						tmplistView.setAdapter(adapter);
-					}
-				});
+					});
+				}
 			}
 			
 		}).execute();

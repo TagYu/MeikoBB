@@ -1,5 +1,6 @@
 package com.example.meikobb.fragment;
 
+import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -80,13 +81,16 @@ public class BBDetailFragment extends BBFragment {
 					@Override
 					protected void onPostExecute(final BBItemBody itemBody) {
 						if( itemBody != null ) {
-							getActivity().runOnUiThread(new Runnable() {
-								@Override
-								public void run() {
-									TextView tvBody = (TextView) view.findViewById(R.id.fragment_bb_detail_textview_body);
-									tvBody.setText(itemBody.getBody());
-								}
-							});
+							Activity activity;
+							if( (activity = getActivity()) != null ) {
+								activity.runOnUiThread(new Runnable() {
+									@Override
+									public void run() {
+										TextView tvBody = (TextView) view.findViewById(R.id.fragment_bb_detail_textview_body);
+										tvBody.setText(itemBody.getBody());
+									}
+								});
+							}
 						}
 					}
 					
