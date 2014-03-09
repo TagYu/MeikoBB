@@ -1,15 +1,15 @@
 package com.example.meikobb.sqlite;
 
+import com.example.meikobb.model.BBItemBody;
+import com.example.meikobb.model.BBItemHead;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
-
-import com.example.meikobb.model.BBItemBody;
-import com.example.meikobb.model.BBItemHead;
 
 /*
  * 参考：
@@ -195,8 +195,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				new String[]{ id_date, id_index },
 				null,
 				null, null, "1");
-
-		return BBItemHead_cursorToObjectAndClose(cursor);
+		
+		try {
+			if( cursor.moveToFirst() ) {
+				return BBItemHead_cursorToObjectAndClose(cursor);
+			}
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
 	}
 	
 	/**
@@ -209,10 +217,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		
 		db.beginTransaction();
 		try {
-			ContentValues v = BBItemHead_generateContentValues(item);
-			long res = db.insert(BBItemHead_TABLE_NAME, null, v);
-			Log.i("DatabaseHelper", "insert(): res="+res);
-			//db.setTransactionSuccessful();
+			db.insertOrThrow(BBItemHead_TABLE_NAME, null, BBItemHead_generateContentValues(item));
+			db.setTransactionSuccessful();
 		} finally {
 			db.endTransaction();
 		}
@@ -346,15 +352,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				null, null, "1");
 
 		try {
-			if (cursor.moveToNext()) {
+			if (cursor.moveToFirst()) {
 				return BBItemBody_cursorToObject(cursor);
 			}
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
-		} finally {
-			cursor.close();
 		}
-
 		return null;
 	}
 	

@@ -76,7 +76,7 @@ public class BBFragment extends Fragment {
 					return null;
 				}
 				
-				return BBManager.getHeads("10");
+				return BBManager.getHeads(null);
 			}
 			
 			/* 処理完了時のリスナー */
@@ -107,6 +107,8 @@ public class BBFragment extends Fragment {
 			}
 			
 		}).execute();
+		
+		
 		
 		return view;
 	}

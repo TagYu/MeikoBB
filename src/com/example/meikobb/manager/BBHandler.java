@@ -95,13 +95,6 @@ public class BBHandler {
 			Log.i("BBHandler", "getAllBBItems(): GET https://rpxkeijiban.ict.nitech.ac.jp/keijiban/app?uri=loginTest&dummy=aaaa; Response: " + response);
 			
 			parser.parse(new InputSource(new InputStreamReader(conn.getInputStream(), "Shift_JIS")));
-//			StringBuilder sb = new StringBuilder();
-//			char[] buf = new char[1024];
-//			BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), "Shift_JIS"));
-//			while(in.read(buf) >= 0) {
-//				sb.append(buf);
-//			}
-//			Log.i("BBHandler", sb.toString());
 		} catch(IOException e) {
 			Log.e("BBHandler", "IO Exception");
 			e.printStackTrace();

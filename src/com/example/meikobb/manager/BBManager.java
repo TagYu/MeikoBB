@@ -44,8 +44,8 @@ public class BBManager {
 	/**
 	 * DB 内の記事一覧を取得
 	 * @param filter concat(記事タイトル, 著者) LIKE %filter%
-	 * @param orderBy 出力する順番をSQL文で指定
-	 * @param limit 出力数の制限をSQL文で指定
+	 * @param orderBy 出力する順番をSQL文で指定, null の場合デフォルト
+	 * @param limit 出力数の制限をSQL文で指定, null の場合制限しない
 	 * @return DB から取得した記事のヘッダ情報のリスト
 	 */
 	public static List<BBItemHead> getHeads(String filter, String orderBy, String limit) {
@@ -59,8 +59,10 @@ public class BBManager {
 						+ " LIKE ?", new String[] { "%" + filter + "%" }, null,
 				null, orderBy, limit);
 		try {
-			while( cursor.moveToNext() ) {
-				list.add(DatabaseHelper.BBItemHead_cursorToObject(cursor));
+			if( cursor.moveToFirst() ) {
+				do {
+					list.add(DatabaseHelper.BBItemHead_cursorToObject(cursor));
+				} while(cursor.moveToNext());
 			}
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
@@ -74,8 +76,8 @@ public class BBManager {
 	
 	/**
 	 * DB 内の記事一覧を取得
-	 * @param orderBy 出力する順番をSQL文で指定
-	 * @param limit 出力数の制限をSQL文で指定
+	 * @param orderBy 出力する順番をSQL文で指定, null の場合デフォルト
+	 * @param limit 出力数の制限をSQL文で指定, null の場合制限しない
 	 * @return DB から取得した記事のヘッダ情報のリスト
 	 */
 	public static List<BBItemHead> getHeads(String orderBy, String limit) {
@@ -85,11 +87,20 @@ public class BBManager {
 	
 	/**
 	 * DB 内の記事一覧を取得
-	 * @param limit 出力数の制限をSQL文で指定
+	 * @param limit 出力数の制限をSQL文で指定, null の場合制限しない
 	 * @return DB から取得した記事のヘッダ情報のリスト
 	 */
 	public static List<BBItemHead> getHeads(String limit) {
 		return getHeads("", sDatabaseHelper.BBItemHead_COL_ID_DATE, limit);
+	}
+	
+	
+	/**
+	 * DB 内の記事一覧を取得
+	 * @return DB から取得した記事のヘッダ情報のリスト
+	 */
+	public static List<BBItemHead> getHeads() {
+		return getHeads("", sDatabaseHelper.BBItemHead_COL_ID_DATE, null);
 	}
 	
 	
