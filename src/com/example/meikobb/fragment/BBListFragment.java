@@ -24,9 +24,11 @@ public class BBListFragment extends BBFragment {
 	 * TODO フラグメント作成
 	 */
 	
+	/* メンバ */
+	boolean mIsFirstViewLoad;
 	
 	
-	/* コンストラクタ */
+	/* newInstance() */
 	
 	/**
 	 * インスタンスの生成
@@ -38,7 +40,14 @@ public class BBListFragment extends BBFragment {
 		return fragment;
 	}
 	
-	
+
+	/* コンストラクタ */
+	public BBListFragment() {
+		super();
+		
+		// メンバ初期化
+		mIsFirstViewLoad = true;
+	}
 	
 	
 	/* オーバーライドメソッド */
@@ -74,6 +83,11 @@ public class BBListFragment extends BBFragment {
 			}
 		});
 		
+		
+		// 2回目以降の表示では、これ以降の処理をしない。
+		if( !mIsFirstViewLoad ) {
+			return view;
+		}
 		
 		
 		/* 裏で更新処理 */
@@ -120,8 +134,22 @@ public class BBListFragment extends BBFragment {
 		}).execute();
 		/* 試作　終わり */
 		
+		mIsFirstViewLoad = false;
 		
 		return view;
+	}
+	
+	
+	/**
+	 * 状態を保存（メモリ上からの破棄時に呼ばれる）
+	 */
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		/*
+		 * このメソッドは onCreate() 内で setRetainInstsance(true) としている場合は呼ばれない
+		 * (BBFragment (継承クラス) に記述あり)
+		 */
 	}
 	
 	
